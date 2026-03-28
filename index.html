@@ -3,1550 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>芝麻分全组合匹配系统 - 审计删除</title>
+    <title>GEEK | 极客空间</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-color: #0a0a0f;
+            --text-primary: #00ff9d;
+            --text-secondary: #00b8ff;
+            --card-bg: rgba(15, 15, 25, 0.8);
+            --border-color: rgba(0, 255, 157, 0.3);
+            --glow-color: rgba(0, 255, 157, 0.5);
         }
-        
         body {
-            font-family: 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(120deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            text-align: center;
-            padding: 35px 20px;
-            position: relative;
-        }
-        
-        h1 {
-            font-size: 2.4rem;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            letter-spacing: 1px;
-        }
-        
-        .subtitle {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 0 auto;
-            margin-top: 8px;
-        }
-        
-        .alipay-logo {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(to right, #1677ff, #00a1e9);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 10px rgba(22, 119, 255, 0.3);
-        }
-        
-        .content {
-            padding: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-        
-        .left-panel, .right-panel {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .panel {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .panel-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #1a365d;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .panel-title::before {
-            content: "📋";
-            font-size: 1.4em;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #595959;
-        }
-        
-        .name-input, .score-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #d9d9d9;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .name-input:focus, .score-input:focus {
-            border-color: #1677ff;
-            outline: none;
-        }
-        
-        .btn-add {
-            background: linear-gradient(120deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.4);
-        }
-        
-        .participants-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #e8e8e8;
-            border-radius: 8px;
-            margin-top: 15px;
-            position: relative;
-        }
-        
-        .participant-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fafafa;
-            transition: background 0.2s;
-        }
-        
-        .participant-item:hover {
-            background: #f0f7ff;
-        }
-        
-        .participant-id {
-            background: #1677ff;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-        
-        .participant-name {
-            font-weight: 600;
-            color: #1a365d;
-        }
-        
-        .participant-score {
-            background: linear-gradient(120deg, #ff8a00 0%, #da1b60 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        
-        /* 删除按钮样式 */
-        .btn-remove {
-            background: #ff4d4f;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .btn-remove:hover {
-            background: #cf1322;
-            transform: scale(1.05);
-        }
-        
-        .btn-remove::before {
-            content: "🗑️";
-        }
-        
-        .btn-match {
-            background: linear-gradient(120deg, #722ed1 0%, #9254de 100%);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.4s;
-            width: 100%;
-            margin: 20px 0;
-            box-shadow: 0 6px 20px rgba(114, 46, 209, 0.4);
-        }
-        
-        .btn-match:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(114, 46, 209, 0.6);
-        }
-        
-        .btn-export {
-            background: linear-gradient(120deg, #13c2c2 0%, #40a9ff 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-        
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(19, 194, 194, 0.4);
-        }
-        
-        .btn-audit {
-            background: linear-gradient(120deg, #fa8c16 0%, #ffa940 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-        
-        .btn-audit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(250, 140, 22, 0.4);
-        }
-        
-        .result-container {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .result-container.show {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .success-container {
-            background: linear-gradient(135deg, #f6ffed 0%, #e6f7ff 100%);
-            border: 3px solid #52c41a;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-        
-        .success-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #b7eb8f;
-        }
-        
-        .success-title {
-            font-size: 2.2rem;
-            color: #52c41a;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .success-count {
-            font-size: 2.8rem;
-            font-weight: bold;
-            color: #1677ff;
-            margin: 15px 0;
-        }
-        
-        .combo-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #1677ff;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .combo-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(0deg, #1677ff, #722ed1);
-        }
-        
-        .combo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .combo-index {
-            background: linear-gradient(120deg, #722ed1 0%, #9254de 100%);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        .combo-total {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #52c41a;
-        }
-        
-        .combo-members {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-        }
-        
-        .member-item {
-            background: #f9fbfd;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e6f7ff;
-        }
-        
-        .member-id {
-            display: inline-block;
-            background: #1677ff;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .member-name {
-            font-weight: 600;
-            color: #595959;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .member-score {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #1677ff;
-        }
-        
-        .no-match {
-            background: linear-gradient(135deg, #fff2e8 0%, #fff7e6 100%);
-            border: 3px solid #fa8c16;
-            border-radius: 16px;
-            padding: 35px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .no-match-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .no-match-title {
-            font-size: 2rem;
-            color: #fa8c16;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-        
-        .current-total {
-            font-size: 2.8rem;
-            font-weight: bold;
-            color: #ff4d4f;
-            margin: 15px 0;
-        }
-        
-        .diff-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        
-        .diff-negative {
-            color: #ff4d4f;
-        }
-        
-        .diff-positive {
-            color: #52c41a;
-        }
-        
-        .target-score {
-            font-size: 1.8rem;
-            color: #1677ff;
-            font-weight: 600;
-            margin: 15px 0;
-        }
-        
-        .members-pair {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        
-        .member-pair-card {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-            border: 2px solid #ffd591;
-            min-width: 180px;
-        }
-        
-        .member-pair-id {
-            display: inline-block;
-            background: #fa8c16;
-            color: white;
-            padding: 6px 15px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        
-        .member-pair-name {
-            font-weight: 700;
-            color: #ad6800;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .member-pair-score {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #fa8c16;
-        }
-        
-        .no-match-tip {
-            background: #fff7e6;
-            border-left: 5px solid #faad14;
-            padding: 20px;
-            border-radius: 0 10px 10px 0;
-            margin-top: 30px;
-            font-size: 1.05rem;
-            line-height: 1.7;
-        }
-        
-        .no-match-tip strong {
-            color: #ad6800;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #8c8c8c;
-        }
-        
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.6;
-        }
-        
-        .empty-state-text {
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            font-weight: 500;
-        }
-        
-        .explanation {
-            background: #f0f7ff;
-            border-left: 5px solid #1677ff;
-            padding: 20px;
-            border-radius: 0 10px 10px 0;
-            margin: 25px 0;
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-        
-        .explanation strong {
-            color: #003a8c;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: #666;
-            font-size: 1.05rem;
-            background: #f9fbfd;
-            border-top: 1px solid #eee;
-            margin-top: 25px;
-        }
-        
-        .stats-bar {
-            background: #f9f0ff;
-            padding: 20px;
-            border-radius: 14px;
-            margin: 25px 0;
-            text-align: center;
-            font-size: 1.1rem;
-            border: 2px solid #d3adf7;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .stats-item {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        
-        .stats-label {
-            color: #8c8c8c;
-            font-size: 0.9rem;
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        .stats-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #722ed1;
-        }
-        
-        .combo-highlight {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(114, 46, 209, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(114, 46, 209, 0); }
-        }
-        
-        /* 删除原因模态框 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            position: relative;
-            animation: modalFadeIn 0.3s;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            color: #ff4d4f;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 700;
-        }
-        
-        .reason-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .reason-option {
-            border: 2px solid #d9d9d9;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        
-        .reason-option:hover {
-            border-color: #1677ff;
-            background: #f0f7ff;
-        }
-        
-        .reason-option.selected {
-            border-color: #ff4d4f;
-            background: #fff2f0;
-            font-weight: 600;
-            transform: scale(1.03);
-        }
-        
-        .custom-reason {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #d9d9d9;
-            border-radius: 8px;
-            font-size: 1rem;
-            margin-bottom: 25px;
-            min-height: 80px;
-            resize: vertical;
-        }
-        
-        .custom-reason:focus {
-            border-color: #1677ff;
-            outline: none;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-        
-        .btn-modal-cancel {
-            flex: 1;
-            background: #d9d9d9;
-            color: #595959;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-modal-cancel:hover {
-            background: #bfbfbf;
-        }
-        
-        .btn-modal-confirm {
-            flex: 1;
-            background: linear-gradient(120deg, #ff4d4f 0%, #cf1322 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
-        }
-        
-        .btn-modal-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 77, 79, 0.4);
-        }
-        
-        .btn-modal-confirm:disabled {
-            background: #ffccc7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .audit-log {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e8e8e8;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .audit-item {
-            padding: 15px;
-            border-bottom: 1px solid #f5f5f5;
-            background: #fff9f9;
-        }
-        
-        .audit-item:last-child {
-            border-bottom: none;
-        }
-        
-        .audit-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        
-        .audit-time {
-            color: #8c8c8c;
-        }
-        
-        .audit-id {
-            background: #ff4d4f;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        .audit-reason {
-            background: #fff2e8;
-            border-left: 3px solid #fa8c16;
-            padding: 10px 15px;
-            border-radius: 0 6px 6px 0;
-            margin: 8px 0;
-            font-size: 0.95rem;
-            color: #ad6800;
-        }
-        
-        .audit-name-score {
-            color: #595959;
-            font-size: 0.95rem;
-            margin-top: 5px;
-        }
-        
-        .data-protection-info {
-            background: #e6f7ff;
-            border: 1px solid #91d5ff;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 0.95rem;
+            font-family: 'Courier New', monospace;
+            background: var(--bg-color);
+            color: var(--text-primary);
             line-height: 1.6;
         }
-        
-        .data-protection-info strong {
-            color: #096dd9;
+        #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 20px 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 10, 15, 0.9); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid var(--border-color);
         }
-        
+        .logo { font-size: 1.8rem; font-weight: bold; text-shadow: 0 0 10px var(--glow-color); }
+        .logo span { color: var(--text-secondary); }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: var(--text-primary); text-decoration: none; transition: 0.3s; }
+        .nav-links a:hover { color: var(--text-secondary); text-shadow: 0 0 10px var(--text-secondary); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 100px 20px 50px; }
+        .hero { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .avatar {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 3px solid var(--text-primary);
+            box-shadow: 0 0 30px var(--glow-color);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 30px var(--glow-color); } 50% { box-shadow: 0 0 50px var(--glow-color); } }
+        h1 { font-size: 3rem; margin: 20px 0; text-shadow: 0 0 20px var(--glow-color); }
+        .highlight { color: var(--text-secondary); }
+        .tagline { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 30px; }
+        .typing { border-right: 2px solid var(--text-primary); animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { border-color: transparent; } }
+        .btn {
+            padding: 15px 40px; border: 2px solid var(--text-primary);
+            background: transparent; color: var(--text-primary);
+            text-decoration: none; margin: 10px; display: inline-block;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--text-primary); color: var(--bg-color); box-shadow: 0 0 30px var(--glow-color); }
+        .btn-primary { background: var(--text-primary); color: var(--bg-color); }
+        .section { margin: 80px 0; }
+        .section-title { font-size: 2rem; text-align: center; margin-bottom: 40px; }
+        .terminal {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; overflow: hidden; margin: 30px 0;
+        }
+        .terminal-header {
+            background: rgba(0,0,0,0.5); padding: 10px;
+            display: flex; gap: 8px; border-bottom: 1px solid var(--border-color);
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27ca40; }
+        .terminal-body { padding: 20px; font-size: 0.95rem; }
+        .prompt { color: var(--text-secondary); }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .skill-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 25px; transition: 0.3s;
+        }
+        .skill-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px var(--glow-color); }
+        .skill-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .progress { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 15px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--text-primary), var(--text-secondary)); border-radius: 3px; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .project-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; overflow: hidden; transition: 0.3s;
+        }
+        .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px var(--glow-color); }
+        .project-img {
+            height: 180px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            display: flex; align-items: center; justify-content: center; font-size: 4rem;
+        }
+        .project-info { padding: 20px; }
+        .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .tag {
+            background: rgba(0,255,157,0.1); color: var(--text-primary);
+            padding: 5px 12px; border-radius: 15px; font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+        }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-top: 40px; }
+        .contact-item {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 25px; text-align: center;
+            text-decoration: none; color: var(--text-primary); transition: 0.3s;
+        }
+        .contact-item:hover { transform: translateY(-5px); box-shadow: 0 10px 30px var(--glow-color); }
+        footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 80px; color: var(--text-secondary); }
         @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-            }
-            
-            .combo-members, .members-pair {
-                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-                gap: 12px;
-            }
-            
-            .reason-options {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content {
-                padding: 20px;
-                width: 95%;
-            }
+            nav { padding: 15px 20px; }
+            .nav-links { display: none; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
+    <canvas id="matrix"></canvas>
+    <nav>
+        <div class="logo">GEEK<span>.IO</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">首页</a></li>
+            <li><a href="#about">关于</a></li>
+            <li><a href="#skills">技能</a></li>
+            <li><a href="#projects">项目</a></li>
+            <li><a href="#contact">联系</a></li>
+        </ul>
+    </nav>
     <div class="container">
-        <header>
-            <div class="alipay-logo">芝麻信用</div>
-            <h1>芝麻分全组合匹配系统</h1>
-            <p class="subtitle">用户可删除自己的数据 · 必须备注删除原因 · 审计日志永久保留</p>
-        </header>
-        
-        <div class="content">
-            <div class="left-panel">
-                <div class="panel">
-                    <h2 class="panel-title">添加参与者</h2>
-                    <div class="input-group">
-                        <label for="nameInput">姓名/昵称</label>
-                        <input type="text" id="nameInput" class="name-input" placeholder="请输入姓名或昵称" value="张三">
-                    </div>
-                    <div class="input-group">
-                        <label for="scoreInput">芝麻分 (350-950)</label>
-                        <input type="number" id="scoreInput" class="score-input" min="350" max="950" placeholder="请输入芝麻分" value="829">
-                    </div>
-                    <button class="btn-add" onclick="addParticipant()">✚ 添加参与者</button>
-                    
-                    <div class="data-protection-info">
-                        <strong>🛡️ 数据管理规则：</strong><br>
-                        • 您可以删除自己添加的参与者，但<strong>必须备注删除原因</strong><br>
-                        • 所有删除操作将被记录到<strong>不可删除的审计日志</strong>中<br>
-                        • 审计日志包含：删除时间、参与者ID、删除原因，用于数据追溯
-                    </div>
-                    
-                    <button class="btn-export" onclick="exportData()">📤 导出全部数据</button>
-                    <button class="btn-audit" onclick="showAuditLog()">📋 查看删除审计日志</button>
-                </div>
-                
-                <div class="panel">
-                    <h2 class="panel-title">已登记参与者 (<span id="participantCount">0</span>)</h2>
-                    <div class="participants-list" id="participantsList">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">👥</div>
-                            <div class="empty-state-text">暂无参与者</div>
-                            <div>请在上方添加参与者信息</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn-match" onclick="matchAllTeams()">🎯 立即查找所有组合</button>
+        <section class="hero" id="home">
+            <div class="avatar">👨‍💻</div>
+            <h1>你好，我是 <span class="highlight">极客开发者</span></h1>
+            <p class="tagline"><span class="typing" id="typing"></span></p>
+            <div>
+                <a href="#projects" class="btn btn-primary">查看项目</a>
+                <a href="#contact" class="btn">联系我</a>
             </div>
-            
-            <div class="right-panel">
-                <div class="panel">
-                    <h2 class="panel-title">匹配结果</h2>
-                    
-                    <div class="stats-bar" id="statsBar" style="display: none;">
-                        <div><strong>📊 参与者统计</strong></div>
-                        <div class="stats-grid">
-                            <div class="stats-item">
-                                <span class="stats-label">总人数</span>
-                                <span class="stats-value" id="statsCount">0</span>
-                            </div>
-                            <div class="stats-item">
-                                <span class="stats-label">最高分</span>
-                                <span class="stats-value" id="statsMax">0</span>
-                            </div>
-                            <div class="stats-item">
-                                <span class="stats-label">最低分</span>
-                                <span class="stats-value" id="statsMin">0</span>
-                            </div>
-                            <div class="stats-item">
-                                <span class="stats-label">组合数</span>
-                                <span class="stats-value" id="statsCombo">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="result-container" id="resultContainer">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🎯</div>
-                            <div class="empty-state-text">点击"立即查找所有组合"开始匹配</div>
-                            <div>系统将查找所有总分恰好等于2026的组合</div>
-                        </div>
-                    </div>
+        </section>
+        <section class="section" id="about">
+            <h2 class="section-title">关于<span class="highlight">我</span></h2>
+            <div class="terminal">
+                <div class="terminal-header"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                <div class="terminal-body">
+                    <p><span class="prompt">user@geek:~$</span> cat about.txt</p>
+                    <p style="color:var(--text-secondary);margin:15px 0;">一名热爱技术的全栈开发者<br>热衷于探索前沿科技，追求极致代码体验<br>喜欢开源社区，享受分享与协作的乐趣<br>座右铭：Code is Poetry, Debug is Life</p>
+                    <p><span class="prompt">user@geek:~$</span> ./stats.sh</p>
+                    <p style="color:var(--text-secondary);margin:15px 0;">📊 代码行数：100,000+<br>🎯 完成项目：50+<br>☕ 咖啡消耗：∞<br>🚀 Bug 修复率：99.9%</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="footer">
-            <p>© 2026 芝麻分全组合匹配系统 | 删除需备注原因 · 审计日志永久保留</p>
-            <p>🔒 安全机制：删除操作可追溯，审计日志不可删除，确保数据操作透明</p>
-        </div>
+        </section>
+        <section class="section" id="skills">
+            <h2 class="section-title">技术<span class="highlight">栈</span></h2>
+            <div class="skills-grid">
+                <div class="skill-card"><div class="skill-icon">🌐</div><h3>前端开发</h3><p style="color:var(--text-secondary);font-size:0.9rem;">React / Vue / TypeScript</p><div class="progress"><div class="progress-bar" style="width:90%"></div></div></div>
+                <div class="skill-card"><div class="skill-icon">⚙️</div><h3>后端开发</h3><p style="color:var(--text-secondary);font-size:0.9rem;">Node.js / Python / Go</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div></div>
+                <div class="skill-card"><div class="skill-icon">🗄️</div><h3>数据库</h3><p style="color:var(--text-secondary);font-size:0.9rem;">MySQL / MongoDB / Redis</p><div class="progress"><div class="progress-bar" style="width:80%"></div></div></div>
+                <div class="skill-card"><div class="skill-icon">☁️</div><h3>云计算</h3><p style="color:var(--text-secondary);font-size:0.9rem;">AWS / Docker / K8s</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div></div>
+                <div class="skill-card"><div class="skill-icon">🤖</div><h3>人工智能</h3><p style="color:var(--text-secondary);font-size:0.9rem;">TensorFlow / PyTorch</p><div class="progress"><div class="progress-bar" style="width:70%"></div></div></div>
+                <div class="skill-card"><div class="skill-icon">🔒</div><h3>网络安全</h3><p style="color:var(--text-secondary);font-size:0.9rem;">渗透测试 / 安全审计</p><div class="progress"><div class="progress-bar" style="width:65%"></div></div></div>
+            </div>
+        </section>
+        <section class="section" id="projects">
+            <h2 class="section-title">精选<span class="highlight">项目</span></h2>
+            <div class="projects-grid">
+                <div class="project-card"><div class="project-img">🚀</div><div class="project-info"><h3>AI 智能助手</h3><p style="color:var(--text-secondary);">基于大语言模型的个人助理</p><div class="tags"><span class="tag">Python</span><span class="tag">TensorFlow</span><span class="tag">NLP</span></div></div></div>
+                <div class="project-card"><div class="project-img">🎮</div><div class="project-info"><h3>区块链游戏</h3><p style="color:var(--text-secondary);">去中心化游戏平台</p><div class="tags"><span class="tag">Solidity</span><span class="tag">Web3</span><span class="tag">React</span></div></div></div>
+                <div class="project-card"><div class="project-img">📱</div><div class="project-info"><h3>跨平台应用</h3><p style="color:var(--text-secondary);">一套代码多端运行</p><div class="tags"><span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Firebase</span></div></div></div>
+            </div>
+        </section>
+        <section class="section" id="contact">
+            <h2 class="section-title">联系<span class="highlight">我</span></h2>
+            <div class="contact-grid">
+                <a href="mailto:geek@example.com" class="contact-item"><div style="font-size:2.5rem;margin-bottom:15px;">📧</div>geek@example.com</a>
+                <a href="https://github.com" class="contact-item"><div style="font-size:2.5rem;margin-bottom:15px;">🐙</div>GitHub</a>
+                <a href="https://linkedin.com" class="contact-item"><div style="font-size:2.5rem;margin-bottom:15px;">💼</div>LinkedIn</a>
+                <a href="https://twitter.com" class="contact-item"><div style="font-size:2.5rem;margin-bottom:15px;">🐦</div>Twitter</a>
+            </div>
+        </section>
     </div>
-    
-    <!-- 删除原因模态框 -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-title">🗑️ 请备注删除原因</div>
-            <div style="text-align: center; margin-bottom: 15px; color: #595959;">
-                参与者: <span id="deleteTargetName" style="font-weight: 600; color: #1a365d;">---</span> 
-                (<span id="deleteTargetScore" style="color: #ff4d4f;">---</span>分)
-            </div>
-            
-            <div class="reason-options">
-                <div class="reason-option" onclick="selectReason(this, '已组队成功')">✅ 已组队成功</div>
-                <div class="reason-option" onclick="selectReason(this, '输入错误')">✏️ 输入错误</div>
-                <div class="reason-option" onclick="selectReason(this, '重复登记')">🔄 重复登记</div>
-                <div class="reason-option" onclick="selectReason(this, '用户退出')">🚪 用户退出</div>
-            </div>
-            
-            <textarea class="custom-reason" id="customReason" placeholder="或输入其他原因（必填，至少5个字）" oninput="validateReason()"></textarea>
-            
-            <div class="modal-buttons">
-                <button class="btn-modal-cancel" onclick="closeDeleteModal()">取消</button>
-                <button class="btn-modal-confirm" id="confirmDeleteBtn" onclick="confirmDelete()" disabled>确认删除</button>
-            </div>
-        </div>
-    </div>
-
+    <footer>
+        <p>&copy; 2024 GEEK.IO | Made with 💚 and ☕</p>
+        <p style="margin-top:10px;font-size:0.85rem;">// Keep Coding, Keep Creating</p>
+    </footer>
     <script>
-        // 全局数据存储
-        const PARTICIPANTS_KEY = 'sesame_participants_v3';
-        const AUDIT_LOG_KEY = 'sesame_audit_log_v3';
-        const ID_COUNTER_KEY = 'sesame_id_counter_v3';
-        
-        let participants = [];
-        let auditLog = [];
-        let nextId = 1;
-        let pendingDeleteId = null;
-        
-        // 初始化：从localStorage加载数据
-        function initStorage() {
-            // 加载参与者数据
-            const savedParticipants = localStorage.getItem(PARTICIPANTS_KEY);
-            if (savedParticipants) {
-                try {
-                    participants = JSON.parse(savedParticipants);
-                } catch (e) {
-                    participants = [];
-                }
-            }
-            
-            // 加载审计日志（不可删除）
-            const savedAuditLog = localStorage.getItem(AUDIT_LOG_KEY);
-            if (savedAuditLog) {
-                try {
-                    auditLog = JSON.parse(savedAuditLog);
-                } catch (e) {
-                    auditLog = [];
-                }
-            }
-            
-            // 加载ID计数器
-            const savedCounter = localStorage.getItem(ID_COUNTER_KEY);
-            if (savedCounter) {
-                nextId = parseInt(savedCounter);
-                // 确保nextId大于现有最大ID
-                if (participants.length > 0) {
-                    const maxId = Math.max(...participants.map(p => parseInt(p.id.substring(1))));
-                    nextId = Math.max(nextId, maxId + 1);
-                }
-            } else {
-                // 初始化ID计数器（基于现有数据）
-                if (participants.length > 0) {
-                    const maxId = Math.max(...participants.map(p => parseInt(p.id.substring(1))));
-                    nextId = maxId + 1;
-                }
-            }
-            
-            // 保存初始状态
-            saveData();
-            updateParticipantsList();
-            updateStats();
-        }
-        
-        // 保存数据到localStorage
-        function saveData() {
-            localStorage.setItem(PARTICIPANTS_KEY, JSON.stringify(participants));
-            localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(auditLog)); // 审计日志永久保留
-            localStorage.setItem(ID_COUNTER_KEY, nextId.toString());
-        }
-        
-        // 生成用户ID
-        function generateUserId() {
-            return `P${String(nextId++).padStart(3, '0')}`;
-        }
-        
-        // 添加参与者
-        function addParticipant() {
-            const nameInput = document.getElementById('nameInput');
-            const scoreInput = document.getElementById('scoreInput');
-            
-            const name = nameInput.value.trim();
-            const score = parseInt(scoreInput.value);
-            
-            // 验证输入
-            if (!name) {
-                alert('请输入姓名或昵称');
-                return;
-            }
-            
-            if (isNaN(score) || score < 350 || score > 950) {
-                alert('芝麻分必须在350到950之间');
-                return;
-            }
-            
-            // 添加到列表（分配唯一ID）
-            const newParticipant = {
-                id: generateUserId(),
-                name: name,
-                score: score,
-                timestamp: new Date().toISOString()
-            };
-            
-            participants.push(newParticipant);
-            
-            // 保存数据
-            saveData();
-            
-            // 清空输入框
-            nameInput.value = '';
-            scoreInput.value = '';
-            
-            // 更新列表
-            updateParticipantsList();
-            updateStats();
-            
-            // 提示
-            alert(`✅ ${newParticipant.name} (${newParticipant.id}) 已添加`);
-        }
-        
-        // 更新参与者列表
-        function updateParticipantsList() {
-            const listElement = document.getElementById('participantsList');
-            const countElement = document.getElementById('participantCount');
-            
-            countElement.textContent = participants.length;
-            
-            if (participants.length === 0) {
-                listElement.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
-                        <div class="empty-state-text">暂无参与者</div>
-                        <div>请在上方添加参与者信息</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // 按ID排序（时间顺序）
-            const sortedParticipants = [...participants].sort((a, b) => {
-                return parseInt(a.id.substring(1)) - parseInt(b.id.substring(1));
-            });
-            
-            // 显示参与者列表（带删除按钮）
-            listElement.innerHTML = sortedParticipants.map(p => `
-                <div class="participant-item">
-                    <div>
-                        <span class="participant-id">${p.id}</span>
-                        <span class="participant-name">${p.name}</span>
-                        <span style="margin-left: 15px; color: #8c8c8c;">芝麻分: </span>
-                        <span class="participant-score">${p.score}</span>
-                    </div>
-                    <button class="btn-remove" onclick="openDeleteModal('${p.id}', '${p.name}', ${p.score})" title="删除参与者（需备注原因）">删除</button>
-                </div>
-            `).join('');
-        }
-        
-        // 打开删除确认模态框
-        function openDeleteModal(participantId, name, score) {
-            pendingDeleteId = participantId;
-            document.getElementById('deleteTargetName').textContent = name;
-            document.getElementById('deleteTargetScore').textContent = score;
-            document.getElementById('customReason').value = '';
-            document.getElementById('confirmDeleteBtn').disabled = true;
-            
-            // 清除已选项
-            document.querySelectorAll('.reason-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            document.getElementById('deleteModal').style.display = 'flex';
-        }
-        
-        // 选择预设原因
-        function selectReason(element, reason) {
-            // 清除其他选项
-            document.querySelectorAll('.reason-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            // 选中当前项
-            element.classList.add('selected');
-            
-            // 填入自定义原因框
-            document.getElementById('customReason').value = reason;
-            validateReason();
-        }
-        
-        // 验证原因
-        function validateReason() {
-            const reason = document.getElementById('customReason').value.trim();
-            document.getElementById('confirmDeleteBtn').disabled = reason.length < 5;
-        }
-        
-        // 关闭模态框
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            pendingDeleteId = null;
-        }
-        
-        // 确认删除
-        function confirmDelete() {
-            if (!pendingDeleteId) return;
-            
-            const reason = document.getElementById('customReason').value.trim();
-            if (reason.length < 5) {
-                alert('删除原因至少需要5个字');
-                return;
-            }
-            
-            // 查找要删除的参与者
-            const index = participants.findIndex(p => p.id === pendingDeleteId);
-            if (index === -1) {
-                alert('未找到该参与者');
-                closeDeleteModal();
-                return;
-            }
-            
-            const participant = participants[index];
-            
-            // 记录审计日志（不可删除）
-            auditLog.push({
-                id: participant.id,
-                name: participant.name,
-                score: participant.score,
-                deleteReason: reason,
-                deleteTime: new Date().toISOString(),
-                deleteTimestamp: Date.now()
-            });
-            
-            // 从参与者列表中移除
-            participants.splice(index, 1);
-            
-            // 保存数据（审计日志永久保留）
-            saveData();
-            
-            // 关闭模态框
-            closeDeleteModal();
-            
-            // 更新界面
-            updateParticipantsList();
-            updateStats();
-            
-            // 提示
-            alert(`✅ ${participant.name} (${participant.id}) 已删除\n原因: ${reason}\n\n⚠️ 删除操作已记录到不可删除的审计日志`);
-        }
-        
-        // 导出全部数据
-        function exportData() {
-            if (participants.length === 0 && auditLog.length === 0) {
-                alert('暂无数据可导出');
-                return;
-            }
-            
-            // 生成导出数据
-            const exportData = {
-                exportTime: new Date().toISOString(),
-                activeParticipants: participants.length,
-                deletedRecords: auditLog.length,
-                participants: participants.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    score: p.score,
-                    addedAt: p.timestamp
-                })),
-                auditLog: auditLog.map(log => ({
-                    participantId: log.id,
-                    name: log.name,
-                    score: log.score,
-                    deleteReason: log.deleteReason,
-                    deleteTime: log.deleteTime
-                })),
-                combinations: findAllPerfectCombinations(participants, 2026).map((combo, index) => ({
-                    combinationId: `C${String(index + 1).padStart(3, '0')}`,
-                    members: combo.members.map(m => m.id),
-                    totalScore: combo.totalScore
-                }))
-            };
-            
-            // 生成JSON文件
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `sesame_score_export_${new Date().toISOString().slice(0,10)}.json`;
-            
-            // 创建下载链接
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            alert(`✅ 数据导出成功\n- 当前参与者: ${participants.length} 人\n- 已删除记录: ${auditLog.length} 条\n- 有效组合: ${exportData.combinations.length} 个`);
-        }
-        
-        // 显示审计日志
-        function showAuditLog() {
-            if (auditLog.length === 0) {
-                alert('暂无删除记录');
-                return;
-            }
-            
-            // 构建审计日志HTML
-            let logHtml = `
-                <div style="padding: 20px; max-width: 800px; margin: 20px auto; background: white; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);">
-                    <div style="text-align: center; margin-bottom: 25px;">
-                        <h2 style="font-size: 1.8rem; color: #ff4d4f; margin-bottom: 10px;">🗂️ 删除审计日志</h2>
-                        <div style="color: #8c8c8c; font-size: 1.1rem;">共 ${auditLog.length} 条不可删除的记录</div>
-                    </div>
-                    
-                    <div style="background: #fff2f0; border: 1px solid #ffa39e; border-radius: 10px; padding: 15px; margin-bottom: 25px; font-size: 0.95rem;">
-                        <strong>🔒 审计日志保护规则：</strong><br>
-                        • 所有删除操作均被永久记录，不可删除、不可篡改<br>
-                        • 记录包含：参与者ID、姓名、分数、删除原因、删除时间<br>
-                        • 用于数据追溯和操作透明度保障
-                    </div>
-                    
-                    <div class="audit-log">
-            `;
-            
-            // 按时间倒序显示（最新在前）
-            const sortedLog = [...auditLog].sort((a, b) => b.deleteTimestamp - a.deleteTimestamp);
-            
-            sortedLog.forEach((log, index) => {
-                const deleteTime = new Date(log.deleteTime).toLocaleString('zh-CN', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                logHtml += `
-                    <div class="audit-item">
-                        <div class="audit-header">
-                            <div>
-                                <span class="audit-id">${log.id}</span>
-                                <span style="margin-left: 10px; font-weight: 600; color: #1a365d;">${log.name}</span>
-                            </div>
-                            <div class="audit-time">${deleteTime}</div>
-                        </div>
-                        <div class="audit-name-score">芝麻分: ${log.score} 分</div>
-                        <div class="audit-reason">📝 ${log.deleteReason}</div>
-                    </div>
-                `;
-            });
-            
-            logHtml += `
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 25px;">
-                        <button onclick="document.body.removeChild(this.parentElement.parentElement)" 
-                                style="background: #ff4d4f; color: white; border: none; padding: 12px 30px; 
-                                       border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer;">
-                            关闭日志
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // 创建模态覆盖层
-            const overlay = document.createElement('div');
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.width = '100%';
-            overlay.style.height = '100%';
-            overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-            overlay.style.zIndex = '2000';
-            overlay.style.display = 'flex';
-            overlay.style.justifyContent = 'center';
-            overlay.style.alignItems = 'center';
-            overlay.onclick = function(e) {
-                if (e.target === overlay) {
-                    document.body.removeChild(overlay);
-                }
-            };
-            
-            overlay.innerHTML = logHtml;
-            document.body.appendChild(overlay);
-        }
-        
-        // 更新统计信息
-        function updateStats() {
-            const statsBar = document.getElementById('statsBar');
-            
-            if (participants.length === 0) {
-                statsBar.style.display = 'none';
-                return;
-            }
-            
-            statsBar.style.display = 'block';
-            document.getElementById('statsCount').textContent = participants.length;
-            
-            const scores = participants.map(p => p.score);
-            const maxScore = Math.max(...scores);
-            const minScore = Math.min(...scores);
-            
-            document.getElementById('statsMax').textContent = maxScore;
-            document.getElementById('statsMin').textContent = minScore;
-        }
-        
-        // 全组合匹配：找出所有恰好等于2026的组合
-        function matchAllTeams() {
-            if (participants.length === 0) {
-                alert('请先添加参与者！');
-                return;
-            }
-            
-            if (participants.length === 1) {
-                alert('至少需要2个参与者才能匹配！');
-                return;
-            }
-            
-            const TARGET = 2026;
-            
-            // 查找所有恰好等于2026的组合
-            const allCombos = findAllPerfectCombinations(participants, TARGET);
-            
-            if (allCombos.length > 0) {
-                // 找到了一个或多个组合
-                showSuccessResult(allCombos);
-            } else {
-                // 找不到，随机选2人
-                const randomPair = getRandomPair(participants);
-                showNoMatchResult(randomPair, TARGET);
+        const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+        canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+        const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
+        const cols=canvas.width/16,drops=[];
+        for(let i=0;i<cols;i++)drops[i]=1;
+        function draw(){
+            ctx.fillStyle='rgba(10,10,15,0.05)';ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle='#0F0';ctx.font='16px monospace';
+            for(let i=0;i<drops.length;i++){
+                ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,drops[i]*16);
+                if(drops[i]*16>canvas.height&&Math.random()>0.975)drops[i]=0;
+                drops[i]++;
             }
         }
-        
-        // 查找所有恰好等于目标分数的组合（2-6人组合）
-        function findAllPerfectCombinations(participants, target) {
-            const n = participants.length;
-            const allCombos = [];
-            
-            // 尝试从2人组合开始，逐步增加人数（最多6人）
-            for (let size = 2; size <= Math.min(6, n); size++) {
-                const combos = getCombinations(participants, size);
-                
-                // 查找所有总分恰好等于目标的组合
-                for (let combo of combos) {
-                    const total = combo.reduce((sum, p) => sum + p.score, 0);
-                    if (total === target) {
-                        allCombos.push({
-                            members: combo,
-                            totalScore: total
-                        });
-                    }
-                }
-            }
-            
-            return allCombos; // 返回所有找到的组合
+        setInterval(draw,30);
+        window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+        const phrases=['全栈开发工程师','开源爱好者','技术博主','终身学习者','问题解决者'];
+        let idx=0,char=0,del=false,speed=100;
+        function type(){
+            const p=phrases[idx];
+            if(del){document.getElementById('typing').textContent=p.substring(0,char-1);char--;speed=50;}
+            else{document.getElementById('typing').textContent=p.substring(0,char+1);char++;speed=100;}
+            else if(del&&char===0){del=false;idx=(idx+1)%phrases.length;speed=500;}
+            setTimeout(type,speed);
         }
-        
-        // 获取所有指定大小的组合
-        function getCombinations(arr, size) {
-            const result = [];
-            
-            function helper(start, combo) {
-                if (combo.length === size) {
-                    result.push([...combo]);
-                    return;
-                }
-                
-                for (let i = start; i < arr.length; i++) {
-                    combo.push(arr[i]);
-                    helper(i + 1, combo);
-                    combo.pop();
-                }
-            }
-            
-            helper(0, []);
-            return result;
-        }
-        
-        // 随机选择2个人
-        function getRandomPair(participants) {
-            if (participants.length <= 2) {
-                return participants;
-            }
-            
-            // 真正随机选择2人
-            const indices = [];
-            while (indices.length < 2) {
-                const idx = Math.floor(Math.random() * participants.length);
-                if (!indices.includes(idx)) {
-                    indices.push(idx);
-                }
-            }
-            
-            return [participants[indices[0]], participants[indices[1]]];
-        }
-        
-        // 显示成功结果（所有恰好等于2026的组合）
-        function showSuccessResult(combos) {
-            const container = document.getElementById('resultContainer');
-            const statsCombo = document.getElementById('statsCombo');
-            
-            statsCombo.textContent = combos.length;
-            
-            let combosHtml = '';
-            
-            combos.forEach((combo, index) => {
-                const membersHtml = combo.members.map(member => `
-                    <div class="member-item">
-                        <div class="member-id">${member.id}</div>
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-score">${member.score}</div>
-                    </div>
-                `).join('');
-                
-                combosHtml += `
-                    <div class="combo-card ${index === 0 ? 'combo-highlight' : ''}">
-                        <div class="combo-header">
-                            <div class="combo-index">组合 #${index + 1}</div>
-                            <div class="combo-total">2026 分</div>
-                        </div>
-                        <div class="combo-members">
-                            ${membersHtml}
-                        </div>
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e8e8e8; text-align: center; color: #8c8c8c; font-size: 0.95rem;">
-                            <strong>成员ID:</strong> ${combo.members.map(m => m.id).join(', ')}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = `
-                <div class="success-container">
-                    <div class="success-header">
-                        <div class="success-title">🎉 找到 ${combos.length} 个完美组合！</div>
-                        <div>以下组合总分恰好等于2026分</div>
-                        <div class="success-count">${combos.length}</div>
-                        <div style="font-size: 1.1rem; color: #595959;">共找到 ${combos.length} 个符合条件的组合</div>
-                    </div>
-                    ${combosHtml}
-                </div>
-            `;
-            
-            container.classList.add('show');
-            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        // 显示未匹配结果（随机2人 + 差异）
-        function showNoMatchResult(pair, target) {
-            const total = pair.reduce((sum, p) => sum + p.score, 0);
-            const diff = total - target;
-            const absDiff = Math.abs(diff);
-            const container = document.getElementById('resultContainer');
-            const statsCombo = document.getElementById('statsCombo');
-            
-            statsCombo.textContent = 0;
-            
-            const diffClass = diff < 0 ? 'diff-negative' : 'diff-positive';
-            const diffText = diff < 0 ? `-${absDiff}` : `+${absDiff}`;
-            const diffMessage = diff < 0 ? `还差 ${absDiff} 分` : `超出 ${absDiff} 分`;
-            const diffColor = diff < 0 ? '#ff4d4f' : '#52c41a';
-            
-            const membersHtml = pair.map(member => `
-                <div class="member-pair-card">
-                    <div class="member-pair-id">${member.id}</div>
-                    <div class="member-pair-name">${member.name}</div>
-                    <div class="member-pair-score">${member.score}</div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = `
-                <div class="no-match">
-                    <div class="no-match-header">
-                        <div class="no-match-title">⚠️ 未找到精准匹配</div>
-                        <div>未找到总分恰好等于2026的组合</div>
-                        <div class="current-total">${total} 分</div>
-                        <div class="target-score">🎯 目标：2026 分</div>
-                        <div class="diff-display ${diffClass}">${diffText}</div>
-                        <div style="font-size: 1.3rem; color: ${diffColor}; font-weight: 600; margin-top: 10px;">
-                            ${diffMessage}
-                        </div>
-                    </div>
-                    <div class="members-pair">
-                        ${membersHtml}
-                    </div>
-                    <div class="no-match-tip">
-                        <strong>💡 组合提示：</strong><br>
-                        • 当前共 ${participants.length} 人，尝试了所有2-6人组合，未找到恰好等于2026的组合<br>
-                        • 可继续添加新成员创建新组合，或删除无效数据后重新匹配
-                    </div>
-                </div>
-            `;
-            
-            container.classList.add('show');
-            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        // 初始化系统
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化存储
-            initStorage();
-            
-            // 回车键添加参与者
-            document.getElementById('nameInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('scoreInput').focus();
-                }
-            });
-            
-            document.getElementById('scoreInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    addParticipant();
-                }
-            });
-            
-            // 点击模态框外部关闭
-            window.addEventListener('click', function(e) {
-                const modal = document.getElementById('deleteModal');
-                if (e.target === modal) {
-                    closeDeleteModal();
-                }
-            });
-            
-            // ESC键关闭模态框
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeDeleteModal();
-                }
+        setTimeout(type,1000);
+        document.querySelectorAll('a[href^="#"]').forEach(a=>{
+            a.addEventListener('click',e=>{
+                e.preventDefault();
+                const t=document.querySelector(a.getAttribute('href'));
+                if(t)t.scrollIntoView({behavior:'smooth'});
             });
         });
     </script>
